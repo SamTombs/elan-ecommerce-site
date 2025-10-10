@@ -4,7 +4,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework import status # status gives us a list of official/possible response codes
 
 from .models import Review
-from .serializers.reviews import ReviewSerializer
+from .serializers.common import ReviewSerializer
 from rest_framework.permissions import IsAuthenticated
 
 class ReviewListView(APIView):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Basket, BasketItem
-from products.serializers import ProductSerializer
+from products.serializers.common import ProductSerializer
 
 class BasketItemSerializer(serializers.ModelSerializer):
     """

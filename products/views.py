@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import NotFound
 from .models import Product
-from .serializers import ProductSerializer
+from .serializers.common import ProductSerializer
+
 
 
 class ProductListView(APIView):
