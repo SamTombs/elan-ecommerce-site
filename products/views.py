@@ -51,7 +51,7 @@ class ProductDetailView(APIView):
 
     def put(self, request, pk):
         product_to_update = self.get_product(pk=pk)
-        if product_to_update.owner != request.user:
+        if product_to_update.owner and product_to_update.owner != request.user:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         updated_product = ProductSerializer(product_to_update, data=request.data)
@@ -64,7 +64,7 @@ class ProductDetailView(APIView):
     def delete(self, request, pk):
         product_to_delete = self.get_product(pk=pk)
 
-        if product_to_delete.owner != request.user:
+        if product_to_delete.owner and product_to_delete.owner != request.user:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         product_to_delete.delete()
