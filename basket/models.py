@@ -17,7 +17,7 @@ class Basket(models.Model):
         ordering = ['-updated_at']
     
     def __str__(self):
-        return f"Basket for {self.user.email}"
+        return f"Basket for {self.user.first_name} {self.user.last_name}"
     
     @property
     def total_items(self):
