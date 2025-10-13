@@ -6,6 +6,7 @@ from datetime import datetime, timedelta # creates timestamps in dif formats
 from django.contrib.auth import get_user_model # gets user model we are using
 from django.conf import settings # import our settings for our secret
 from .serializers import UserSerializer
+from rest_framework.permissions import IsAuthenticated
 import jwt # import jwt
 
 User = get_user_model() # Save user model to User var
@@ -71,3 +72,10 @@ class LoginView(APIView):
         
         print(f'SUCCESS: User {username} logged in')
         return Response({ 'token': token, 'message': f"Welcome back {user_to_login.username}"})
+
+class UserView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        serialized_user = UserSerializer(request.user)
+        return Response(serialized_user.data, status=status.HTTP_200_OK)

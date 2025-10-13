@@ -3,9 +3,7 @@ from .models import Basket, BasketItem
 from products.serializers.common import ProductSerializer
 
 class BasketItemSerializer(serializers.ModelSerializer):
-    """
-    Serializer for individual basket items
-    """
+
     product = ProductSerializer(read_only=True)
     product_id = serializers.IntegerField(write_only=True)
     total_price = serializers.ReadOnlyField()
@@ -16,15 +14,13 @@ class BasketItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'added_at', 'updated_at']
     
     def validate_quantity(self, value):
-        """Validate quantity is positive"""
+
         if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than 0")
         return value
 
 class BasketSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the entire basket
-    """
+
     items = BasketItemSerializer(many=True, read_only=True)
     total_items = serializers.ReadOnlyField()
     total_price = serializers.ReadOnlyField()
@@ -35,14 +31,12 @@ class BasketSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 class AddToBasketSerializer(serializers.Serializer):
-    """
-    Serializer for adding items to basket
-    """
+
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField(default=1, min_value=1)
     
     def validate_product_id(self, value):
-        """Validate that the product exists"""
+
         from products.models import Product
         try:
             Product.objects.get(id=value)
@@ -51,13 +45,11 @@ class AddToBasketSerializer(serializers.Serializer):
         return value
 
 class UpdateBasketItemSerializer(serializers.Serializer):
-    """
-    Serializer for updating basket item quantity
-    """
+
     quantity = serializers.IntegerField(min_value=1)
     
     def validate_quantity(self, value):
-        """Validate quantity is positive"""
+
         if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than 0")
         return value
