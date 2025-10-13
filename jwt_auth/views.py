@@ -16,22 +16,46 @@ class RegisterView(APIView):
         print('REGISTRATION REQUEST DATA:', request.data)
         user_to_create = UserSerializer(data=request.data)
         if user_to_create.is_valid():
-            user_to_create.save()
-            return Response({'message': 'Registration successful'}, status=status.HTTP_202_ACCEPTED)
+            user = user_to_create.save()
+            
+            # Generate JWT token for the newly created user
+            dt = datetime.now() + timedelta(days=7)
+            token = jwt.encode(
+                {'sub': str(user.id), 'exp': int(dt.strftime('%s'))},
+                settings.SECRET_KEY,
+                algorithm='HS256'
+            )
+            # Ensure token is returned as string
+            if isinstance(token, bytes):
+                token = token.decode('utf-8')
+            
+            return Response({
+                'token': token,
+                'message': f'Welcome {user.username}!'
+            }, status=status.HTTP_201_CREATED)
         print('SERIALIZER ERRORS:', user_to_create.errors)
         return Response(user_to_create.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class LoginView(APIView):
 
     def post(self, request):
+        print('LOGIN REQUEST DATA:', request.data)
         # get data from the request
-        email = request.data.get('email')
+        username = request.data.get('username')
         password = request.data.get('password')
+        
+        if not username or not password:
+            print('ERROR: Missing username or password')
+            raise PermissionDenied(detail='Please provide both username and password')
+        
         try:
-            user_to_login = User.objects.get(email=email) # get user with email
+            user_to_login = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise PermissionDenied(detail='Invalid Credentials') # throw error
+            print(f'ERROR: User not found with username: {username}')
+            raise PermissionDenied(detail='Invalid Credentials')
+        
         if not user_to_login.check_password(password):
+            print('ERROR: Invalid password')
             raise PermissionDenied(detail='Invalid Credentials')
 
         # timedelta can be used to calculate the difference between dates - passing 7 days gives you 7 days represented as a date that we can add to datetime.now() to get the date 7 days from now
@@ -45,4 +69,5 @@ class LoginView(APIView):
         if isinstance(token, bytes):
             token = token.decode('utf-8')
         
+        print(f'SUCCESS: User {username} logged in')
         return Response({ 'token': token, 'message': f"Welcome back {user_to_login.username}"})
