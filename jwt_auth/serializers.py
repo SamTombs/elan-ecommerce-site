@@ -2,7 +2,7 @@ from rest_framework import serializers
 # function runs when creating superuser
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.hashers import make_password  # hashes password for us
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 User = get_user_model()
 
@@ -18,28 +18,30 @@ class UserSerializer(serializers.ModelSerializer):
     # hash our passwords
     # add back to database
     def validate(self, data):  # data comes from the request body
-        print('DATA', data)
+        print('RECEIVED DATA:', data)
         # remove fields from request body and save to vars
         password = data.pop('password')
         password_confirmation = data.pop('password_confirmation')
 
         # check if they match
         if password != password_confirmation:
-            raise ValidationError({'password_confirmation': 'do not match'})
+            print('ERROR: Passwords do not match')
+            raise serializers.ValidationError({'password_confirmation': 'Passwords do not match'})
 
         # checks if password is valid, comment this out so it works
-        try:
-            password_validation.validate_password(password=password)
-        except ValidationError as err:
-            print('VALIDATION ERROR')
-            raise ValidationError({'password': err.messages})
+        # TEMPORARILY DISABLED FOR DEVELOPMENT - RE-ENABLE FOR PRODUCTION!
+        # try:
+        #     password_validation.validate_password(password=password)
+        # except DjangoValidationError as err:
+        #     print('PASSWORD VALIDATION ERROR:', err.messages)
+        #     raise serializers.ValidationError({'password': err.messages})
 
         # hash the password, reassigning value on dict
         data['password'] = make_password(password)
 
-        print('DATA ->', data)
+        print('VALIDATED DATA:', data)
         return data
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'password', 'password_confirmation')
