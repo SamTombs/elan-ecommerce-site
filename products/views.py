@@ -20,16 +20,10 @@ class ProductListView(APIView):
     def post(self, request):
         request.data["owner"] = request.user.id
         product_to_add = ProductSerializer(data=request.data)
-        try:
-            product_to_add.is_valid()
+        if product_to_add.is_valid():
             product_to_add.save()
             return Response(product_to_add.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            print("Error")
-            # the below is necessary because two different formats of errors are possible. string or object format.
-            # if it's string then e.__dict__ returns an empty dict {}
-            # so we'll check it's a dict first, and if it's empty (falsey) then we'll use str() to convert to a string
-            return Response(e.__dict__ if e.__dict__ else str(e), status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return Response(product_to_add.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 class ProductDetailView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly, ) # sets the permission levels of the specific view by passing in the rest framework authentication class
@@ -42,13 +36,9 @@ class ProductDetailView(APIView):
             raise NotFound(detail="Can't find that product") # <-- import the NotFound exception from rest_framwork.exceptions
 
     def get(self, _request, pk):
-        try:
-            product = self.get_product(pk=pk)
-            serialized_product = ProductSerializer(product)
-            return Response(serialized_product.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            print("Error")
-            return Response(e.__dict__ if e.__dict__ else str(e), status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        product = self.get_product(pk=pk)
+        serialized_product = ProductSerializer(product)
+        return Response(serialized_product.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         product_to_update = self.get_product(pk=pk)

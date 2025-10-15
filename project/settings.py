@@ -25,11 +25,14 @@ SECRET_KEY = 'django-insecure-y532mk2dy%4x8g!l#+odvm(^w08c5*k!5**s17za-2d_rz-c6z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = 'jwt_auth.User'
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+MEDIA_ROOT = "uploads"
+MEDIA_URL = "/media/"
 
 
 # Application definition
