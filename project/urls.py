@@ -25,4 +25,8 @@ urlpatterns = [
     path('api/auth/', include('jwt_auth.urls')),
     path('api/basket/', include('basket.urls')),
     path('api/reviews/', include('reviews.urls')),
-] 
+]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

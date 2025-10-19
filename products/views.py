@@ -60,3 +60,19 @@ class ProductDetailView(APIView):
 
         product_to_delete.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CategoryProductListView(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get(self, request, category):
+        # Validate category
+        valid_categories = ['lift', 'explore', 'vault']
+        if category not in valid_categories:
+            return Response(
+                {'error': 'Invalid category'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        products = Product.objects.filter(category=category)
+        serialized_products = ProductSerializer(products, many=True)
+        return Response(serialized_products.data, status=status.HTTP_200_OK)
