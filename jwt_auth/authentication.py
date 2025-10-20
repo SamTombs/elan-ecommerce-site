@@ -6,7 +6,6 @@ import jwt
 
 User = get_user_model()
 
-
 class JWTAuthentication(BasicAuthentication):
     def authenticate(self, request):
         header = request.headers.get('Authorization')

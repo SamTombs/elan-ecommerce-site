@@ -14,7 +14,6 @@ class BasketItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'added_at', 'updated_at']
     
     def validate_quantity(self, value):
-
         if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than 0")
         return value
@@ -22,12 +21,11 @@ class BasketItemSerializer(serializers.ModelSerializer):
 class BasketSerializer(serializers.ModelSerializer):
 
     items = BasketItemSerializer(many=True, read_only=True)
-    total_items = serializers.ReadOnlyField()
     total_price = serializers.ReadOnlyField()
     
     class Meta:
-        model = Basket
-        fields = ['id', 'items', 'total_items', 'total_price', 'created_at', 'updated_at']
+        model = Basket  
+        fields = ['id', 'items', 'total_price', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 class AddToBasketSerializer(serializers.Serializer):
@@ -45,7 +43,6 @@ class AddToBasketSerializer(serializers.Serializer):
         return value
 
 class UpdateBasketItemSerializer(serializers.Serializer):
-
     quantity = serializers.IntegerField(min_value=1)
     
     def validate_quantity(self, value):
