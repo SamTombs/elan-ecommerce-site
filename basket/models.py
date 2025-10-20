@@ -10,11 +10,6 @@ class Basket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    class Meta:
-        ordering = ['-updated_at']
-    
-    def __str__(self):
-        return f"Basket for {self.user.first_name} {self.user.last_name}"
     
     @property
     def total_price(self):
@@ -28,12 +23,8 @@ class BasketItem(models.Model):
     added_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
         
-    def __str__(self):
-        return f"{self.quantity}x {self.product.name} in {self.basket.user.email}'s basket"
-    
     @property
     def total_price(self):
- 
         return self.quantity * self.product.price
     
     def save(self, *args, **kwargs):
