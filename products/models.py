@@ -20,8 +20,6 @@ class Product(models.Model):
     sizes = models.CharField(max_length=60)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='explore')
     product_image = models.ImageField(upload_to='products/', blank=True, null=True)
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
 
     class Meta:
         db_table = "products"
