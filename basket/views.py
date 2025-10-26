@@ -31,13 +31,8 @@ class AddToBasketView(APIView):
             product_id = serializer.validated_data['product_id']
             quantity = serializer.validated_data['quantity']
 
-            # Get or create basket for user
             basket, created = Basket.objects.get_or_create(user=request.user)
-
-            # Get the product
             product = get_object_or_404(Product, id=product_id)
-
-            # Check if item already exists in basket
             basket_item, created = BasketItem.objects.get_or_create(
                 basket=basket,
                 product=product,
@@ -45,11 +40,9 @@ class AddToBasketView(APIView):
             )
 
             if not created:
-                # Item already exists, update quantity
                 basket_item.quantity += quantity
                 basket_item.save()
 
-            # Return updated basket
             basket_serializer = BasketSerializer(basket)
             return Response(basket_serializer.data, status=status.HTTP_200_OK)
 
@@ -65,7 +58,6 @@ class UpdateBasketItemView(APIView):
         if serializer.is_valid():
             quantity = serializer.validated_data['quantity']
 
-            # Get the basket item (ensuring it belongs to the current user)
             basket_item = get_object_or_404(
                 BasketItem,
                 id=item_id,
@@ -73,7 +65,7 @@ class UpdateBasketItemView(APIView):
             )
             basket_item.quantity = quantity
             basket_item.save()
-            # Return updated basket
+
             basket_serializer = BasketSerializer(basket_item.basket)
             return Response(basket_serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
